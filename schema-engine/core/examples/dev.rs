@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use psl::SourceFile;
 use schema_connector::SchemaConnector;
 use schema_core::{
     commands,
@@ -34,13 +35,38 @@ async fn main() {
     // dbg!(result.connector_type());
 
     // instantiate connector directly
-    let connector = SqlSchemaConnector::new_postgres();
+    let mut connector = SqlSchemaConnector::new_postgres();
     dbg!(connector.connector_type());
 
+    // read prisma schema
+    let schema_contents = r#"
+        datasource db {
+            provider = "postgres"
+            url = ""
+        }
+
+        model counter {
+            id    Int @id @default(autoincrement())
+            value Int
+        }
+    "#;
+    let schema_to = connector
+        .database_schema_from_diff_target(
+            schema_connector::DiffTarget::Datamodel(SourceFile::new_allocated(Arc::from(schema_contents))),
+            None,
+            None,
+        )
+        .await
+        .expect("invalid schema");
+
     // run connector.diff
-    let from = connector.empty_database_schema();
-    let to = connector.empty_database_schema();
-    let migration = connector.diff(from, to);
+    let schema_from = connector.empty_database_schema();
+    let migration = connector.diff(schema_from, schema_to);
     let script_string = connector.render_script(&migration, &Default::default());
     dbg!(&script_string);
+
+    if let Ok(script) = script_string {
+        println!("** script **");
+        println!("{}", script);
+    }
 }
