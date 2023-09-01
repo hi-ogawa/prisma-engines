@@ -1,0 +1,9 @@
+{
+  "name": "@hiogawa/prisma-diff-napi",
+  "scripts": {
+    "build": "napi build --platform"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.16.3"
+  }
+}

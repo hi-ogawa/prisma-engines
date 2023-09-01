@@ -2565,6 +2565,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ebd4419172727423cf30351406c54f6cc1b354a2cfb4f1dba3e6cd07f6d5522b"
 
 [[package]]
+name = "napi-build"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "882a73d9ef23e8dc2ebbffb6a6ae2ef467c0f18ac10711e4cc59c5485d41df0e"
+
+[[package]]
 name = "napi-derive"
 version = "2.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3223,6 +3229,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "prisma-diff-napi"
+version = "0.0.0"
+dependencies = [
+ "napi",
+ "napi-build 2.0.1",
+ "napi-derive",
+]
+
+[[package]]
 name = "prisma-fmt"
 version = "0.1.0"
 dependencies = [
@@ -3616,7 +3631,7 @@ dependencies = [
  "futures",
  "js-connectors",
  "napi",
- "napi-build",
+ "napi-build 1.2.1",
  "napi-derive",
  "opentelemetry",
  "prisma-models",
