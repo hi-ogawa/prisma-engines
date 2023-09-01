@@ -3235,6 +3235,9 @@ dependencies = [
  "napi",
  "napi-build 2.0.1",
  "napi-derive",
+ "psl",
+ "schema-connector",
+ "sql-schema-connector",
 ]
 
 [[package]]
