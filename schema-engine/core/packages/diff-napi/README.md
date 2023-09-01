@@ -3,27 +3,7 @@
 ```sh
 pnpm build
 pnpm build --release --strip
-```
-
-```js
-lib = require("./index.js");
-sql = await lib.diffSchema(
-  "postgres",
-  `
-    model counter {
-        id    Int @id @default(autoincrement())
-    }
-  `,
-  `
-    model counter {
-        id    Int @id @default(autoincrement())
-        value Int
-    }
-  `,
-);
-console.log(sql);
-// -- AlterTable
-// ALTER TABLE "counter" ADD COLUMN     "value" INTEGER NOT NULL;
+pnpm test
 ```
 
 ## todo
