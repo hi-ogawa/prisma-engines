@@ -13,8 +13,8 @@ use sql_schema_connector::SqlSchemaConnector;
 // cargo run -p schema-core --example dev
 
 // TODO:
-// - reduce features?
-// - napi build as a simple schema diff library (without IO (fs or db))?
+// - choose features to minimize binary?
+// - napi build as a simple schema diff library without IO (fs or db)?
 // - is wasm-bindgen build possible since no IO needed for raw prisma schema diff feature?
 // - frontend? (prisma.schema editor? generate raw sql for migration?)
 
@@ -46,12 +46,21 @@ async fn main() {
     dbg!(connector.connector_type());
 
     // read prisma schema
-    let schema_contents = r#"
-        datasource db {
-            provider = "postgres"
-            url = ""
+    let schema_from_contents = r#"
+        model counter {
+            id    Int @id @default(autoincrement())
         }
+    "#;
+    let schema_from = connector
+        .database_schema_from_diff_target(
+            schema_connector::DiffTarget::Datamodel(SourceFile::new_allocated(Arc::from(schema_from_contents))),
+            None,
+            None,
+        )
+        .await
+        .expect("invalid schema");
 
+    let schema_to_contents = r#"
         model counter {
             id    Int @id @default(autoincrement())
             value Int
@@ -59,7 +68,7 @@ async fn main() {
     "#;
     let schema_to = connector
         .database_schema_from_diff_target(
-            schema_connector::DiffTarget::Datamodel(SourceFile::new_allocated(Arc::from(schema_contents))),
+            schema_connector::DiffTarget::Datamodel(SourceFile::new_allocated(Arc::from(schema_to_contents))),
             None,
             None,
         )
@@ -67,7 +76,6 @@ async fn main() {
         .expect("invalid schema");
 
     // run connector.diff
-    let schema_from = connector.empty_database_schema();
     let migration = connector.diff(schema_from, schema_to);
     let script_string = connector.render_script(&migration, &Default::default());
 
