@@ -14,6 +14,7 @@ napi = { version = "2.12.2", default-features = false, features = ["napi4", "asy
 napi-derive = "2.12.2"
 
 psl = { path = "../../../../psl/psl" }
+psl-core = { path = "../../../../psl/psl-core" }
 schema-connector = { path = "../../../connectors/schema-connector" }
 sql-schema-connector = { path = "../../../connectors/sql-schema-connector" }
 

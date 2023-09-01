@@ -6,8 +6,9 @@ pnpm build --release --strip
 ```
 
 ```js
-const lib = require("./index.js");
-const sql = await lib.diffSchema(
+lib = require("./index.js");
+sql = await lib.diffSchema(
+  "postgres",
   `
     model counter {
         id    Int @id @default(autoincrement())
