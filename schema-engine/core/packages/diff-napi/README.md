@@ -15,3 +15,4 @@ pnpm test
 ## links
 
 - https://github.com/napi-rs/napi-rs/issues/796
+- https://github.com/prisma/prisma-engines/pull/4118

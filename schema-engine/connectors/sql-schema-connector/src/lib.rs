@@ -148,6 +148,16 @@ impl SqlSchemaConnector {
             DiffTarget::Empty => Ok(self.flavour.empty_database_schema().into()),
         }
     }
+
+    ///
+    pub fn db_schema_from_schema_string(&mut self, schema_string: &str) -> ConnectorResult<DatabaseSchema> {
+        let schema = psl::parse_schema(schema_string).map_err(ConnectorError::new_schema_parser_error)?;
+        self.flavour.check_schema_features(&schema)?;
+        Ok(From::from(sql_schema_calculator::calculate_sql_schema(
+            &schema,
+            self.flavour.as_ref(),
+        )))
+    }
 }
 
 impl SchemaConnector for SqlSchemaConnector {
