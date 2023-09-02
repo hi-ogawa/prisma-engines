@@ -3239,6 +3239,7 @@ dependencies = [
  "psl-core",
  "schema-connector",
  "sql-schema-connector",
+ "tokio",
 ]
 
 [[package]]
