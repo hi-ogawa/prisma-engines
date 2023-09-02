@@ -97,8 +97,8 @@ impl TestApi {
                 #[cfg(not(feature = "slim"))]
                 {
                     sql_schema_describer::sqlite::SqlSchemaDescriber::new(&self.database)
-                    .describe_impl()
-                    .await
+                        .describe_impl()
+                        .await
                 }
 
                 #[cfg(feature = "slim")]

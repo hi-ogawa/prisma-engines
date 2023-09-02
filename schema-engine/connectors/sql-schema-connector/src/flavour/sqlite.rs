@@ -1,5 +1,6 @@
 mod connection;
 
+#[cfg(not(feature = "slim"))]
 use self::connection::*;
 use crate::flavour::SqlFlavour;
 use indoc::indoc;
@@ -9,6 +10,7 @@ use schema_connector::{
 use sql_schema_describer::SqlSchema;
 use std::path::Path;
 
+#[cfg(not(feature = "slim"))]
 type State = super::State<Params, Connection>;
 
 struct Params {
@@ -17,12 +19,14 @@ struct Params {
 }
 
 pub(crate) struct SqliteFlavour {
+    #[cfg(not(feature = "slim"))]
     state: State,
 }
 
 impl Default for SqliteFlavour {
     fn default() -> Self {
-        SqliteFlavour { state: State::Initial }
+        SqliteFlavour {}
+        // SqliteFlavour { state: State::Initial }
     }
 }
 
@@ -33,6 +37,7 @@ impl std::fmt::Debug for SqliteFlavour {
 }
 
 impl SqlFlavour for SqliteFlavour {
+    #[cfg(not(feature = "slim"))]
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         self.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE")
     }
@@ -41,6 +46,7 @@ impl SqlFlavour for SqliteFlavour {
         "sqlite"
     }
 
+    #[cfg(not(feature = "slim"))]
     fn apply_migration_script<'a>(
         &'a mut self,
         migration_name: &'a str,
@@ -51,12 +57,14 @@ impl SqlFlavour for SqliteFlavour {
         }))
     }
 
+    #[cfg(not(feature = "slim"))]
     fn connection_string(&self) -> Option<&str> {
         self.state
             .params()
             .map(|p| p.connector_params.connection_string.as_str())
     }
 
+    #[cfg(not(feature = "slim"))]
     fn table_names(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
         Box::pin(async move {
             let select = r#"SELECT name AS table_name FROM sqlite_master WHERE type='table' ORDER BY name ASC"#;
@@ -71,6 +79,7 @@ impl SqlFlavour for SqliteFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
         Box::pin(async {
             let params = self.state.get_unwrapped_params();
@@ -93,6 +102,7 @@ impl SqlFlavour for SqliteFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn create_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         let sql = indoc! {r#"
             CREATE TABLE "_prisma_migrations" (
@@ -114,6 +124,7 @@ impl SqlFlavour for SqliteFlavour {
         psl::builtin_connectors::SQLITE
     }
 
+    #[cfg(not(feature = "slim"))]
     fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         Box::pin(async move {
             let schema = with_connection(&mut self.state, |_, conn| Ok(Box::pin(conn.describe_schema())))?.await?;
@@ -121,6 +132,7 @@ impl SqlFlavour for SqliteFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         let params = self.state.get_unwrapped_params();
         let file_path = &params.file_path;
@@ -130,10 +142,12 @@ impl SqlFlavour for SqliteFlavour {
         ready(ret)
     }
 
+    #[cfg(not(feature = "slim"))]
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         self.raw_cmd("DROP TABLE _prisma_migrations")
     }
 
+    #[cfg(not(feature = "slim"))]
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         let params = self.state.get_unwrapped_params();
         let path = std::path::Path::new(&params.file_path);
@@ -157,6 +171,7 @@ impl SqlFlavour for SqliteFlavour {
         ready(result)
     }
 
+    #[cfg(not(feature = "slim"))]
     fn load_migrations_table(
         &mut self,
     ) -> BoxFuture<
@@ -239,6 +254,7 @@ impl SqlFlavour for SqliteFlavour {
         }))
     }
 
+    #[cfg(not(feature = "slim"))]
     fn query<'a>(
         &'a mut self,
         query: quaint::ast::Query<'a>,
@@ -246,6 +262,7 @@ impl SqlFlavour for SqliteFlavour {
         ready(with_connection(&mut self.state, |_, conn| conn.query(query)))
     }
 
+    #[cfg(not(feature = "slim"))]
     fn query_raw<'a>(
         &'a mut self,
         sql: &'a str,
@@ -255,6 +272,7 @@ impl SqlFlavour for SqliteFlavour {
         ready(with_connection(&mut self.state, |_, conn| conn.query_raw(sql, params)))
     }
 
+    #[cfg(not(feature = "slim"))]
     fn introspect(
         &mut self,
         namespaces: Option<Namespaces>,
@@ -280,10 +298,12 @@ impl SqlFlavour for SqliteFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
         ready(with_connection(&mut self.state, |_, conn| conn.raw_cmd(sql)))
     }
 
+    #[cfg(not(feature = "slim"))]
     fn reset(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         ready(with_connection(&mut self.state, move |params, connection| {
             let file_path = &params.file_path;
@@ -306,6 +326,7 @@ impl SqlFlavour for SqliteFlavour {
         }))
     }
 
+    #[cfg(not(feature = "slim"))]
     fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()> {
         let quaint::connector::SqliteParams { file_path, .. } =
             quaint::connector::SqliteParams::try_from(params.connection_string.as_str())
@@ -319,6 +340,7 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn set_preview_features(&mut self, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {
+        #[cfg(not(feature = "slim"))]
         match &mut self.state {
             super::State::Initial => {
                 if !preview_features.is_empty() {
@@ -331,6 +353,7 @@ impl SqlFlavour for SqliteFlavour {
         }
     }
 
+    #[cfg(not(feature = "slim"))]
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
@@ -358,19 +381,23 @@ impl SqlFlavour for SqliteFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
         ready(Ok(Some(quaint::connector::sqlite_version().to_owned())))
     }
 
+    #[cfg(not(feature = "slim"))]
     fn search_path(&self) -> &str {
         "main"
     }
 }
 
+#[cfg(not(feature = "slim"))]
 fn acquire_lock(connection: &mut Connection) -> ConnectorResult<()> {
     connection.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE")
 }
 
+#[cfg(not(feature = "slim"))]
 fn with_connection<'a, O, C>(state: &'a mut State, f: C) -> ConnectorResult<O>
 where
     O: 'a + Send,

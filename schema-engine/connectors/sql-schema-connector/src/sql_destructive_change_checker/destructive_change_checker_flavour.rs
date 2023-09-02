@@ -31,8 +31,10 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
         step_index: usize,
     );
 
+    #[cfg(not(feature = "slim"))]
     fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>>;
 
+    #[cfg(not(feature = "slim"))]
     fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>>;
 }
 

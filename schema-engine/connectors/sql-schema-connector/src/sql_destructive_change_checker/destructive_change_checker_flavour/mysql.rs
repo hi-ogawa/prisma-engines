@@ -128,6 +128,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
         }
     }
 
+    #[cfg(not(feature = "slim"))]
     fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>> {
         // TODO(MultiSchema): replace this when implementing MySQL.
         let query = format!("SELECT COUNT(*) FROM `{}`", table.table);
@@ -139,6 +140,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>> {
         // TODO(MultiSchema): replace this when implementing MySQL.
         let query = format!(
@@ -159,6 +161,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
 /// This is necessary because destructive change checks can come after a migration, and _on
 /// Vitess_, schema changes are asynchronous, they can take time to take effect. That causes
 /// failures in destructive change checks. Trying again later, in this case, works.
+#[cfg(not(feature = "slim"))]
 async fn query_with_backoff(flavour: &mut MysqlFlavour, query: &str) -> ConnectorResult<quaint::prelude::ResultSet> {
     let delay = std::time::Duration::from_millis(400);
     let mut result = flavour.query_raw(query, &[]).await;

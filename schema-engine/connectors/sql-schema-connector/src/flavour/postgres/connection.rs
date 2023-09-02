@@ -1,3 +1,5 @@
+#![cfg(not(feature = "slim"))]
+
 //! All the quaint-wrangling for the postgres connector should happen here.
 
 use enumflags2::BitFlags;

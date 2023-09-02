@@ -1,3 +1,5 @@
+#![cfg(not(feature = "slim"))]
+
 //! All the quaint-wrangling for the sqlite connector should happen here.
 
 pub(crate) use quaint::connector::rusqlite;

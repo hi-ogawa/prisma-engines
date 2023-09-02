@@ -7,6 +7,7 @@ use schema_connector::{ConnectorResult, DestructiveChangeDiagnostics, Migration}
 use sql_schema_describer::SqlSchema;
 use tracing_futures::Instrument;
 
+#[cfg(not(feature = "slim"))]
 #[tracing::instrument(skip(flavour, migration))]
 pub(crate) async fn apply_migration(
     migration: &Migration,
@@ -103,6 +104,7 @@ pub(crate) fn render_script(
     Ok(script)
 }
 
+#[cfg(not(feature = "slim"))]
 #[tracing::instrument(skip(script, connector))]
 pub(crate) async fn apply_script(
     migration_name: &str,

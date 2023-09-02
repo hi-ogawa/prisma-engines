@@ -283,6 +283,7 @@ impl SqlSchemaConnector {
     }
 }
 
+#[cfg(not(feature = "slim"))]
 impl DestructiveChangeChecker for SqlSchemaConnector {
     fn check<'a>(
         &'a mut self,

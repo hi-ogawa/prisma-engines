@@ -79,6 +79,7 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
         unreachable!("check_drop_and_recreate_column on SQLite");
     }
 
+    #[cfg(not(feature = "slim"))]
     fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let query = format!("SELECT COUNT(*) FROM \"{}\"", table.table);
@@ -87,6 +88,7 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let query = format!(

@@ -1,6 +1,7 @@
 mod connection;
 mod shadow_db;
 
+#[cfg(not(feature = "slim"))]
 use self::connection::*;
 use crate::SqlFlavour;
 use enumflags2::BitFlags;
@@ -26,6 +27,7 @@ const COCKROACHDB_PRELUDE: &str = r#"
 SET enable_experimental_alter_column_type_general = true;
 "#;
 
+#[cfg(not(feature = "slim"))]
 type State = super::State<Params, (BitFlags<Circumstances>, Connection)>;
 
 struct Params {
@@ -45,13 +47,15 @@ pub(crate) enum PostgresProvider {
 }
 
 pub(crate) struct PostgresFlavour {
+    #[cfg(not(feature = "slim"))]
     state: State,
     provider: PostgresProvider,
 }
 
 impl Default for PostgresFlavour {
     fn default() -> Self {
-        PostgresFlavour::new_unspecified()
+        PostgresFlavour::new_postgres()
+        // PostgresFlavour::new_unspecified()
     }
 }
 
@@ -64,6 +68,7 @@ impl std::fmt::Debug for PostgresFlavour {
 impl PostgresFlavour {
     pub(crate) fn new_postgres() -> Self {
         PostgresFlavour {
+            #[cfg(not(feature = "slim"))]
             state: State::Initial,
             provider: PostgresProvider::PostgreSql,
         }
@@ -71,11 +76,13 @@ impl PostgresFlavour {
 
     pub(crate) fn new_cockroach() -> Self {
         PostgresFlavour {
+            #[cfg(not(feature = "slim"))]
             state: State::Initial,
             provider: PostgresProvider::CockroachDb,
         }
     }
 
+    #[cfg(not(feature = "slim"))]
     pub(crate) fn new_unspecified() -> Self {
         PostgresFlavour {
             state: State::Initial,
@@ -83,6 +90,7 @@ impl PostgresFlavour {
         }
     }
 
+    #[cfg(not(feature = "slim"))]
     fn circumstances(&self) -> Option<BitFlags<Circumstances>> {
         match &self.state {
             State::Initial | State::WithParams(_) => None,
@@ -92,18 +100,20 @@ impl PostgresFlavour {
 
     pub(crate) fn is_cockroachdb(&self) -> bool {
         self.provider == PostgresProvider::CockroachDb
-            || self
-                .circumstances()
-                .map(|c| c.contains(Circumstances::IsCockroachDb))
-                .unwrap_or(false)
+        // || self
+        //     .circumstances()
+        //     .map(|c| c.contains(Circumstances::IsCockroachDb))
+        //     .unwrap_or(false)
     }
 
+    #[cfg(not(feature = "slim"))]
     pub(crate) fn schema_name(&self) -> &str {
         self.state.params().map(|p| p.url.schema()).unwrap_or("public")
     }
 }
 
 impl SqlFlavour for PostgresFlavour {
+    #[cfg(not(feature = "slim"))]
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(self, move |params, circumstances, connection| async move {
             // They do not support advisory locking:
@@ -142,6 +152,7 @@ impl SqlFlavour for PostgresFlavour {
         }
     }
 
+    #[cfg(not(feature = "slim"))]
     fn table_names(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
         Box::pin(async move {
             let search_path = self.schema_name().to_string();
@@ -178,12 +189,14 @@ impl SqlFlavour for PostgresFlavour {
         }
     }
 
+    #[cfg(not(feature = "slim"))]
     fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         with_connection(self, |params, circumstances, conn| async move {
             conn.describe_schema(circumstances, params, namespaces).await
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn introspect<'a>(
         &'a mut self,
         namespaces: Option<Namespaces>,
@@ -200,6 +213,7 @@ impl SqlFlavour for PostgresFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn query<'a>(
         &'a mut self,
         q: quaint::ast::Query<'a>,
@@ -207,6 +221,7 @@ impl SqlFlavour for PostgresFlavour {
         with_connection(self, move |params, _, conn| conn.query(q, &params.url))
     }
 
+    #[cfg(not(feature = "slim"))]
     fn query_raw<'a>(
         &'a mut self,
         sql: &'a str,
@@ -217,6 +232,7 @@ impl SqlFlavour for PostgresFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn apply_migration_script<'a>(
         &'a mut self,
         migration_name: &'a str,
@@ -227,12 +243,15 @@ impl SqlFlavour for PostgresFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn connection_string(&self) -> Option<&str> {
-        self.state
-            .params()
-            .map(|p| p.connector_params.connection_string.as_str())
+        None
+        // self.state
+        //     .params()
+        //     .map(|p| p.connector_params.connection_string.as_str())
     }
 
+    #[cfg(not(feature = "slim"))]
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
         Box::pin(async {
             let params = self.state.get_unwrapped_params();
@@ -276,6 +295,7 @@ impl SqlFlavour for PostgresFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn create_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         let sql = indoc! {r#"
             CREATE TABLE _prisma_migrations (
@@ -293,6 +313,7 @@ impl SqlFlavour for PostgresFlavour {
         self.raw_cmd(sql)
     }
 
+    #[cfg(not(feature = "slim"))]
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async move {
             let params = self.state.get_unwrapped_params();
@@ -312,6 +333,7 @@ impl SqlFlavour for PostgresFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(self.raw_cmd("DROP TABLE _prisma_migrations"))
     }
@@ -322,16 +344,19 @@ impl SqlFlavour for PostgresFlavour {
         schema
     }
 
+    #[cfg(not(feature = "slim"))]
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(self, |_, _, _| future::ready(Ok(())))
     }
 
+    #[cfg(not(feature = "slim"))]
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
         with_connection(self, move |params, _circumstances, conn| async move {
             conn.raw_cmd(sql, &params.url).await
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn reset(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(self, move |params, _circumstances, conn| async move {
             let schemas_to_reset = match namespaces {
@@ -358,6 +383,7 @@ impl SqlFlavour for PostgresFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn set_params(&mut self, mut connector_params: ConnectorParams) -> ConnectorResult<()> {
         let mut url: Url = connector_params
             .connection_string
@@ -373,6 +399,7 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     fn set_preview_features(&mut self, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {
+        #[cfg(not(feature = "slim"))]
         match &mut self.state {
             super::State::Initial => {
                 if !preview_features.is_empty() {
@@ -385,6 +412,7 @@ impl SqlFlavour for PostgresFlavour {
         }
     }
 
+    #[cfg(not(feature = "slim"))]
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
@@ -471,12 +499,14 @@ impl SqlFlavour for PostgresFlavour {
         }
     }
 
+    #[cfg(not(feature = "slim"))]
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
         with_connection(self, |params, _circumstances, connection| async move {
             connection.version(&params.url).await
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn search_path(&self) -> &str {
         self.schema_name()
     }
@@ -492,6 +522,7 @@ fn strip_schema_param_from_url(url: &mut Url) {
 
 /// Try to connect as an admin to a postgres database. We try to pick a default database from which
 /// we can create another database.
+#[cfg(not(feature = "slim"))]
 async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Connection, PostgresUrl)> {
     // "postgres" is the default database on most postgres installations,
     // "template1" is guaranteed to exist, and "defaultdb" is the only working
@@ -556,6 +587,7 @@ fn disable_postgres_statement_cache(url: &mut Url) -> ConnectorResult<()> {
     Ok(())
 }
 
+#[cfg(not(feature = "slim"))]
 fn with_connection<'a, O, F, C>(flavour: &'a mut PostgresFlavour, f: C) -> BoxFuture<'a, ConnectorResult<O>>
 where
     O: 'a,
@@ -644,6 +676,7 @@ where
     })
 }
 
+#[cfg(not(feature = "slim"))]
 #[cfg(test)]
 mod tests {
     use super::*;

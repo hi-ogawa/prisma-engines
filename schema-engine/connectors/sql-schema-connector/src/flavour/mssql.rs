@@ -1,6 +1,7 @@
 mod connection;
 mod shadow_db;
 
+#[cfg(not(feature = "slim"))]
 use self::connection::*;
 use crate::SqlFlavour;
 use connection_string::JdbcString;
@@ -12,6 +13,7 @@ use schema_connector::{
 use sql_schema_describer::SqlSchema;
 use std::{future, str::FromStr};
 
+#[cfg(not(feature = "slim"))]
 type State = super::State<Params, Connection>;
 
 pub(crate) struct Params {
@@ -26,12 +28,14 @@ impl Params {
 }
 
 pub(crate) struct MssqlFlavour {
+    #[cfg(not(feature = "slim"))]
     state: State,
 }
 
 impl Default for MssqlFlavour {
     fn default() -> Self {
-        MssqlFlavour { state: State::Initial }
+        MssqlFlavour {}
+        // MssqlFlavour { state: State::Initial }
     }
 }
 
@@ -43,7 +47,8 @@ impl std::fmt::Debug for MssqlFlavour {
 
 impl MssqlFlavour {
     pub(crate) fn schema_name(&self) -> &str {
-        self.state.params().map(|p| p.url.schema()).unwrap_or("dbo")
+        "dbo"
+        // self.state.params().map(|p| p.url.schema()).unwrap_or("dbo")
     }
 
     /// Get the url as a JDBC string, extract the database name, and re-encode the string.
@@ -58,6 +63,7 @@ impl MssqlFlavour {
 }
 
 impl SqlFlavour for MssqlFlavour {
+    #[cfg(not(feature = "slim"))]
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         // see
         // https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-getapplock-transact-sql?view=sql-server-ver15
@@ -68,6 +74,7 @@ impl SqlFlavour for MssqlFlavour {
         )
     }
 
+    #[cfg(not(feature = "slim"))]
     fn apply_migration_script<'a>(
         &'a mut self,
         migration_name: &'a str,
@@ -82,6 +89,7 @@ impl SqlFlavour for MssqlFlavour {
         psl::builtin_connectors::MSSQL
     }
 
+    #[cfg(not(feature = "slim"))]
     fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         with_connection(&mut self.state, |params, connection| async move {
             connection.describe_schema(params, namespaces).await
@@ -92,6 +100,7 @@ impl SqlFlavour for MssqlFlavour {
         (self.schema_name().to_owned(), crate::MIGRATIONS_TABLE_NAME.to_owned()).into()
     }
 
+    #[cfg(not(feature = "slim"))]
     fn connection_string(&self) -> Option<&str> {
         self.state
             .params()
@@ -102,6 +111,7 @@ impl SqlFlavour for MssqlFlavour {
         "mssql"
     }
 
+    #[cfg(not(feature = "slim"))]
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
         Box::pin(async {
             let params = self.state.get_unwrapped_params();
@@ -136,6 +146,7 @@ impl SqlFlavour for MssqlFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn create_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         let sql = formatdoc! { r#"
             CREATE TABLE [{}].[{}] (
@@ -153,6 +164,7 @@ impl SqlFlavour for MssqlFlavour {
         Box::pin(async move { self.raw_cmd(&sql).await })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async {
             let params = self.state.get_unwrapped_params();
@@ -192,6 +204,7 @@ impl SqlFlavour for MssqlFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn table_names(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
         Box::pin(async move {
             let search_path = self.schema_name().to_string();
@@ -226,11 +239,13 @@ impl SqlFlavour for MssqlFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         let sql = format!("DROP TABLE [{}].[{}]", self.schema_name(), crate::MIGRATIONS_TABLE_NAME);
         Box::pin(async move { self.raw_cmd(&sql).await })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn query<'a>(
         &'a mut self,
         query: quaint::ast::Query<'a>,
@@ -240,6 +255,7 @@ impl SqlFlavour for MssqlFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn query_raw<'a>(
         &'a mut self,
         sql: &'a str,
@@ -250,6 +266,7 @@ impl SqlFlavour for MssqlFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     #[tracing::instrument(skip(self))]
     fn reset(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(&mut self.state, move |params, connection| async move {
@@ -376,14 +393,17 @@ impl SqlFlavour for MssqlFlavour {
         schema
     }
 
+    #[cfg(not(feature = "slim"))]
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         self.raw_cmd("SELECT 1")
     }
 
+    #[cfg(not(feature = "slim"))]
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
         with_connection(&mut self.state, move |params, conn| conn.raw_cmd(sql, params))
     }
 
+    #[cfg(not(feature = "slim"))]
     fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()> {
         let url = MssqlUrl::new(&connector_params.connection_string).map_err(ConnectorError::url_parse_error)?;
         let params = Params { connector_params, url };
@@ -392,6 +412,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     fn set_preview_features(&mut self, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {
+        #[cfg(not(feature = "slim"))]
         match &mut self.state {
             super::State::Initial => {
                 if !preview_features.is_empty() {
@@ -404,6 +425,7 @@ impl SqlFlavour for MssqlFlavour {
         }
     }
 
+    #[cfg(not(feature = "slim"))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
@@ -492,17 +514,20 @@ impl SqlFlavour for MssqlFlavour {
         }
     }
 
+    #[cfg(not(feature = "slim"))]
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
         with_connection(&mut self.state, |params, connection| async {
             connection.version(params).await
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn search_path(&self) -> &str {
         self.schema_name()
     }
 }
 
+#[cfg(not(feature = "slim"))]
 fn with_connection<'a, O, F, C>(state: &'a mut State, f: C) -> BoxFuture<'a, ConnectorResult<O>>
 where
     O: 'a,
@@ -522,6 +547,7 @@ where
 }
 
 /// Call this on the _main_ database when you are done with a shadow database.
+#[cfg(not(feature = "slim"))]
 async fn clean_up_shadow_database(
     database_name: &str,
     connection: &mut Connection,
@@ -531,6 +557,7 @@ async fn clean_up_shadow_database(
     connection.raw_cmd(&drop_database, params).await
 }
 
+#[cfg(not(feature = "slim"))]
 #[cfg(test)]
 mod tests {
     use super::*;

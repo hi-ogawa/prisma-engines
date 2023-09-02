@@ -1,3 +1,5 @@
+#![cfg(not(feature = "slim"))]
+
 use crate::flavour::*;
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
 use sql_schema_describer::SqlSchema;

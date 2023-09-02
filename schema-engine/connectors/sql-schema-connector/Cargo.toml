@@ -4,12 +4,16 @@ name = "sql-schema-connector"
 version = "0.1.0"
 
 [features]
+default = ["slim"]
+slim = []
 vendored-openssl = ["quaint/vendored-openssl"]
 
 [dependencies]
 psl.workspace = true
-quaint.workspace = true
-tokio.workspace = true
+# quaint.workspace = true
+quaint = { path = "../../../quaint", default-features = false, features = ["slim"] }
+# tokio.workspace = true
+tokio = { version = "1.25", features = ["rt", "macros", "sync", "io-util", "time"] }
 serde.workspace = true
 indoc.workspace = true
 uuid = { workspace = true, features = ["v4"] }
@@ -19,7 +23,7 @@ schema-connector = { path = "../schema-connector" }
 sql-schema-describer = { path = "../../sql-schema-describer", features = ["slim"] }
 datamodel-renderer = { path = "../../datamodel-renderer" }
 sql-ddl = { path = "../../../libs/sql-ddl" }
-user-facing-errors = { path = "../../../libs/user-facing-errors", features = ["sql"] }
+user-facing-errors = { path = "../../../libs/user-facing-errors", features = [] }
 
 chrono = { version = "0.4" }
 connection-string.workspace = true
@@ -33,3 +37,5 @@ url = "2.1.1"
 either = "1.6"
 sqlformat = "0.2.1"
 sqlparser = "0.32.0"
+
+# cargo build -p sql-schema-connector --features slim --target wasm32-unknown-unknown

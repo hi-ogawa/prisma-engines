@@ -40,6 +40,7 @@ impl DestructiveCheckPlan {
     /// errors.
     ///
     /// For example, dropping a table that has 0 rows can be considered safe.
+    #[cfg(not(feature = "slim"))]
     #[tracing::instrument(skip(flavour), level = "debug")]
     pub(super) async fn execute(
         &self,
@@ -89,6 +90,7 @@ impl DestructiveCheckPlan {
     }
 
     /// Perform the database inspection for a given [`Check`](trait.Check.html).
+    #[cfg(not(feature = "slim"))]
     pub(super) async fn inspect_for_check(
         &self,
         check: &(dyn Check + Send + Sync + 'static),

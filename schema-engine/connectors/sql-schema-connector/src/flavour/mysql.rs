@@ -1,6 +1,7 @@
 mod connection;
 mod shadow_db;
 
+#[cfg(not(feature = "slim"))]
 use self::connection::*;
 use crate::{error::SystemDatabase, flavour::SqlFlavour};
 use enumflags2::BitFlags;
@@ -19,6 +20,7 @@ use url::Url;
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
 static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"`[^ ]+`\.`[^ ]+`"#).unwrap());
 
+#[cfg(not(feature = "slim"))]
 type State = super::State<Params, (BitFlags<Circumstances>, Connection)>;
 
 struct Params {
@@ -27,12 +29,14 @@ struct Params {
 }
 
 pub(crate) struct MysqlFlavour {
+    #[cfg(not(feature = "slim"))]
     state: State,
 }
 
 impl Default for MysqlFlavour {
     fn default() -> Self {
-        MysqlFlavour { state: State::Initial }
+        MysqlFlavour {}
+        // MysqlFlavour { state: State::Initial }
     }
 }
 
@@ -44,21 +48,26 @@ impl std::fmt::Debug for MysqlFlavour {
 
 impl MysqlFlavour {
     pub(crate) fn is_mariadb(&self) -> bool {
-        self.circumstances().contains(Circumstances::IsMariadb)
+        false
+        // self.circumstances().contains(Circumstances::IsMariadb)
     }
 
     pub(crate) fn is_mysql_5_6(&self) -> bool {
-        self.circumstances().contains(Circumstances::IsMysql56)
+        false
+        // self.circumstances().contains(Circumstances::IsMysql56)
     }
 
     pub(crate) fn lower_cases_table_names(&self) -> bool {
-        self.circumstances().contains(Circumstances::LowerCasesTableNames)
+        false
+        // self.circumstances().contains(Circumstances::LowerCasesTableNames)
     }
 
     pub(crate) fn database_name(&self) -> &str {
-        self.state.params().map(|p| p.url.dbname()).unwrap_or("mysql")
+        "mysql"
+        // self.state.params().map(|p| p.url.dbname()).unwrap_or("mysql")
     }
 
+    #[cfg(not(feature = "slim"))]
     fn circumstances(&self) -> BitFlags<Circumstances> {
         match self.state {
             super::State::Initial | super::State::WithParams(_) => Default::default(),
@@ -68,6 +77,7 @@ impl MysqlFlavour {
 }
 
 impl SqlFlavour for MysqlFlavour {
+    #[cfg(not(feature = "slim"))]
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(&mut self.state, |params, _, connection| async move {
             // We do not acquire advisory locks on PlanetScale instances.
@@ -95,12 +105,14 @@ impl SqlFlavour for MysqlFlavour {
         psl::builtin_connectors::MYSQL
     }
 
+    #[cfg(not(feature = "slim"))]
     fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         with_connection(&mut self.state, |params, circumstances, connection| async move {
             connection.describe_schema(circumstances, params).await
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn table_names(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
         Box::pin(async move {
             let select = r#"
@@ -134,6 +146,7 @@ impl SqlFlavour for MysqlFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn apply_migration_script<'a>(
         &'a mut self,
         migration_name: &'a str,
@@ -191,12 +204,14 @@ impl SqlFlavour for MysqlFlavour {
         }
     }
 
+    #[cfg(not(feature = "slim"))]
     fn connection_string(&self) -> Option<&str> {
         self.state
             .params()
             .map(|p| p.connector_params.connection_string.as_str())
     }
 
+    #[cfg(not(feature = "slim"))]
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
         Box::pin(async {
             let params = self.state.get_unwrapped_params();
@@ -216,6 +231,7 @@ impl SqlFlavour for MysqlFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn create_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         let sql = indoc! {r#"
             CREATE TABLE _prisma_migrations (
@@ -233,6 +249,7 @@ impl SqlFlavour for MysqlFlavour {
         self.raw_cmd(sql)
     }
 
+    #[cfg(not(feature = "slim"))]
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         Box::pin(async {
             let params = self.state.get_unwrapped_params();
@@ -247,14 +264,17 @@ impl SqlFlavour for MysqlFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         self.raw_cmd("DROP TABLE _prisma_migrations")
     }
 
+    #[cfg(not(feature = "slim"))]
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(&mut self.state, |_, _, _| future::ready(Ok(())))
     }
 
+    #[cfg(not(feature = "slim"))]
     fn query<'a>(
         &'a mut self,
         q: quaint::ast::Query<'a>,
@@ -264,6 +284,7 @@ impl SqlFlavour for MysqlFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn query_raw<'a>(
         &'a mut self,
         sql: &'a str,
@@ -274,12 +295,14 @@ impl SqlFlavour for MysqlFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
         with_connection(&mut self.state, move |params, _, conn| async move {
             conn.raw_cmd(sql, &params.url).await
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn reset(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(&mut self.state, move |params, circumstances, connection| async move {
             if circumstances.contains(Circumstances::IsVitess) {
@@ -301,6 +324,7 @@ impl SqlFlavour for MysqlFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()> {
         let url: Url = params
             .connection_string
@@ -315,10 +339,12 @@ impl SqlFlavour for MysqlFlavour {
         Ok(())
     }
 
+    #[cfg(not(feature = "slim"))]
     fn scan_migration_script(&self, script: &str) {
         scan_migration_script_impl(script)
     }
 
+    #[cfg(not(feature = "slim"))]
     #[tracing::instrument(skip(self, migrations))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
@@ -398,6 +424,7 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     fn set_preview_features(&mut self, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {
+        #[cfg(not(feature = "slim"))]
         match &mut self.state {
             super::State::Initial => {
                 if !preview_features.is_empty() {
@@ -410,12 +437,14 @@ impl SqlFlavour for MysqlFlavour {
         }
     }
 
+    #[cfg(not(feature = "slim"))]
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
         with_connection(&mut self.state, |params, _, connection| async {
             connection.version(&params.url).await
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn search_path(&self) -> &str {
         self.database_name()
     }
@@ -452,6 +481,7 @@ fn check_datamodel_for_mysql_5_6(datamodel: &ValidatedSchema, errors: &mut Vec<S
         });
 }
 
+#[cfg(not(feature = "slim"))]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -490,6 +520,7 @@ mod tests {
     }
 }
 
+#[cfg(not(feature = "slim"))]
 fn with_connection<'a, O, F, C>(state: &'a mut State, f: C) -> BoxFuture<'a, ConnectorResult<O>>
 where
     O: 'a,

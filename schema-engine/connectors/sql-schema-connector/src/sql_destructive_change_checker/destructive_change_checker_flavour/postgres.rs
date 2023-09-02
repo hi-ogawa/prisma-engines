@@ -125,6 +125,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
         }
     }
 
+    #[cfg(not(feature = "slim"))]
     fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let from = match &table.namespace {
@@ -137,6 +138,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let from = match &column.namespace {

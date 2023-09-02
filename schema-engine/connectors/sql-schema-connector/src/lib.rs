@@ -90,6 +90,7 @@ impl SqlSchemaConnector {
     }
 
     /// Made public for tests.
+    #[cfg(not(feature = "slim"))]
     pub fn describe_schema(
         &mut self,
         namespaces: Option<Namespaces>,
@@ -98,6 +99,7 @@ impl SqlSchemaConnector {
     }
 
     /// For tests
+    #[cfg(not(feature = "slim"))]
     pub async fn query_raw(
         &mut self,
         sql: &str,
@@ -107,6 +109,7 @@ impl SqlSchemaConnector {
     }
 
     /// For tests
+    #[cfg(not(feature = "slim"))]
     pub async fn query(
         &mut self,
         query: impl Into<quaint::ast::Query<'_>>,
@@ -115,15 +118,18 @@ impl SqlSchemaConnector {
     }
 
     /// For tests
+    #[cfg(not(feature = "slim"))]
     pub async fn raw_cmd(&mut self, sql: &str) -> ConnectorResult<()> {
         self.flavour.raw_cmd(sql).await
     }
 
     /// Prepare the connector to connect.
+    #[cfg(not(feature = "slim"))]
     pub fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()> {
         self.flavour.set_params(params)
     }
 
+    #[cfg(not(feature = "slim"))]
     async fn db_schema_from_diff_target(
         &mut self,
         target: DiffTarget<'_>,
@@ -148,6 +154,16 @@ impl SqlSchemaConnector {
             DiffTarget::Empty => Ok(self.flavour.empty_database_schema().into()),
         }
     }
+
+    /// no-doc
+    pub fn db_schema_from_schema_string(&self, schema_string: &str) -> ConnectorResult<DatabaseSchema> {
+        let schema = psl::parse_schema(schema_string).map_err(ConnectorError::new_schema_parser_error)?;
+        self.flavour.check_schema_features(&schema)?;
+        Ok(From::from(sql_schema_calculator::calculate_sql_schema(
+            &schema,
+            self.flavour.as_ref(),
+        )))
+    }
 }
 
 impl SchemaConnector for SqlSchemaConnector {
@@ -156,7 +172,8 @@ impl SchemaConnector for SqlSchemaConnector {
     }
 
     fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()> {
-        self.flavour.set_params(params)
+        todo!()
+        // self.flavour.set_params(params)
     }
 
     fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>) {
@@ -164,7 +181,8 @@ impl SchemaConnector for SqlSchemaConnector {
     }
 
     fn connection_string(&self) -> Option<&str> {
-        self.flavour.connection_string()
+        todo!();
+        // self.flavour.connection_string()
     }
 
     fn connector_type(&self) -> &'static str {
@@ -172,15 +190,18 @@ impl SchemaConnector for SqlSchemaConnector {
     }
 
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        Box::pin(self.flavour.acquire_lock())
+        todo!()
+        // Box::pin(self.flavour.acquire_lock())
     }
 
     fn apply_migration<'a>(&'a mut self, migration: &'a Migration) -> BoxFuture<'a, ConnectorResult<u32>> {
-        Box::pin(apply_migration::apply_migration(migration, self.flavour.as_mut()))
+        todo!()
+        // Box::pin(apply_migration::apply_migration(migration, self.flavour.as_mut()))
     }
 
     fn apply_script<'a>(&'a mut self, migration_name: &'a str, script: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
-        Box::pin(apply_migration::apply_script(migration_name, script, self))
+        todo!()
+        // Box::pin(apply_migration::apply_script(migration_name, script, self))
     }
 
     fn empty_database_schema(&self) -> DatabaseSchema {
@@ -188,7 +209,8 @@ impl SchemaConnector for SqlSchemaConnector {
     }
 
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        self.flavour.ensure_connection_validity()
+        todo!()
+        // self.flavour.ensure_connection_validity()
     }
 
     fn host(&self) -> &Arc<dyn ConnectorHost> {
@@ -196,16 +218,18 @@ impl SchemaConnector for SqlSchemaConnector {
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
-        Box::pin(async {
-            self.flavour
-                .version()
-                .await
-                .map(|version| version.unwrap_or_else(|| "Database version information not available.".to_owned()))
-        })
+        todo!()
+        // Box::pin(async {
+        //     self.flavour
+        //         .version()
+        //         .await
+        //         .map(|version| version.unwrap_or_else(|| "Database version information not available.".to_owned()))
+        // })
     }
 
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
-        self.flavour.create_database()
+        todo!()
+        // self.flavour.create_database()
     }
 
     fn database_schema_from_diff_target<'a>(
@@ -214,15 +238,17 @@ impl SchemaConnector for SqlSchemaConnector {
         shadow_database_connection_string: Option<String>,
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
-        Box::pin(async move {
-            self.db_schema_from_diff_target(diff_target, shadow_database_connection_string, namespaces)
-                .await
-                .map(From::from)
-        })
+        todo!()
+        // Box::pin(async move {
+        //     self.db_schema_from_diff_target(diff_target, shadow_database_connection_string, namespaces)
+        //         .await
+        //         .map(From::from)
+        // })
     }
 
     fn db_execute(&mut self, script: String) -> BoxFuture<'_, ConnectorResult<()>> {
-        Box::pin(async move { self.flavour.raw_cmd(&script).await })
+        todo!()
+        // Box::pin(async move { self.flavour.raw_cmd(&script).await })
     }
 
     #[tracing::instrument(skip(self, from, to))]
@@ -240,26 +266,28 @@ impl SchemaConnector for SqlSchemaConnector {
     }
 
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        self.flavour.drop_database()
+        todo!()
+        // self.flavour.drop_database()
     }
 
     fn introspect<'a>(
         &'a mut self,
         ctx: &'a IntrospectionContext,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
-        Box::pin(async move {
-            let mut namespace_names = match ctx.namespaces() {
-                Some(namespaces) => namespaces.iter().map(|s| s.to_string()).collect(),
-                None => ctx.datasource().namespaces.iter().map(|(s, _)| s.to_string()).collect(),
-            };
+        todo!()
+        // Box::pin(async move {
+        //     let mut namespace_names = match ctx.namespaces() {
+        //         Some(namespaces) => namespaces.iter().map(|s| s.to_string()).collect(),
+        //         None => ctx.datasource().namespaces.iter().map(|(s, _)| s.to_string()).collect(),
+        //     };
 
-            let namespaces = Namespaces::from_vec(&mut namespace_names);
-            let sql_schema = self.flavour.introspect(namespaces, ctx).await?;
-            let search_path = self.flavour.search_path();
-            let datamodel = introspection::datamodel_calculator::calculate(&sql_schema, ctx, search_path);
+        //     let namespaces = Namespaces::from_vec(&mut namespace_names);
+        //     let sql_schema = self.flavour.introspect(namespaces, ctx).await?;
+        //     let search_path = self.flavour.search_path();
+        //     let datamodel = introspection::datamodel_calculator::calculate(&sql_schema, ctx, search_path);
 
-            Ok(datamodel)
-        })
+        //     Ok(datamodel)
+        // })
     }
 
     fn migration_file_extension(&self) -> &'static str {
@@ -279,13 +307,14 @@ impl SchemaConnector for SqlSchemaConnector {
     }
 
     fn reset(&mut self, soft: bool, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
-        Box::pin(async move {
-            if soft || self.flavour.reset(namespaces.clone()).await.is_err() {
-                best_effort_reset(self.flavour.as_mut(), namespaces).await?;
-            }
+        todo!()
+        // Box::pin(async move {
+        //     if soft || self.flavour.reset(namespaces.clone()).await.is_err() {
+        //         best_effort_reset(self.flavour.as_mut(), namespaces).await?;
+        //     }
 
-            Ok(())
-        })
+        //     Ok(())
+        // })
     }
 
     fn migration_summary(&self, migration: &Migration) -> String {
@@ -298,15 +327,18 @@ impl SchemaConnector for SqlSchemaConnector {
         &self,
         datamodel: &ValidatedSchema,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
-        self.flavour.check_database_version_compatibility(datamodel)
+        todo!()
+        // self.flavour.check_database_version_compatibility(datamodel)
     }
 
     fn destructive_change_checker(&mut self) -> &mut dyn DestructiveChangeChecker {
-        self
+        todo!()
+        // self
     }
 
     fn migration_persistence(&mut self) -> &mut dyn MigrationPersistence {
-        self
+        todo!()
+        // self
     }
 
     #[tracing::instrument(skip(self, migrations))]
@@ -315,12 +347,13 @@ impl SchemaConnector for SqlSchemaConnector {
         migrations: &'a [MigrationDirectory],
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
-        Box::pin(async move {
-            self.flavour
-                .sql_schema_from_migration_history(migrations, None, namespaces)
-                .await?;
-            Ok(())
-        })
+        todo!()
+        // Box::pin(async move {
+        //     self.flavour
+        //         .sql_schema_from_migration_history(migrations, None, namespaces)
+        //         .await?;
+        //     Ok(())
+        // })
     }
 
     fn extract_namespaces(&self, schema: &DatabaseSchema) -> Option<Namespaces> {
@@ -341,6 +374,7 @@ fn new_shadow_database_name() -> String {
 
 /// Try to reset the database to an empty state. This should only be used
 /// when we don't have the permissions to do a full reset.
+#[cfg(not(feature = "slim"))]
 #[tracing::instrument(skip(flavour))]
 async fn best_effort_reset(
     flavour: &mut (dyn SqlFlavour + Send + Sync),
@@ -351,6 +385,7 @@ async fn best_effort_reset(
         .map_err(|err| err.into_soft_reset_failed_error())
 }
 
+#[cfg(not(feature = "slim"))]
 async fn best_effort_reset_impl(
     flavour: &mut (dyn SqlFlavour + Send + Sync),
     namespaces: Option<Namespaces>,
@@ -390,7 +425,7 @@ async fn best_effort_reset_impl(
     };
 
     if migration.before.table_walker(crate::MIGRATIONS_TABLE_NAME).is_some() {
-        flavour.drop_migrations_table().await?;
+        // flavour.drop_migrations_table().await?;
     }
 
     if migration.steps.is_empty() {
@@ -403,7 +438,7 @@ async fn best_effort_reset_impl(
         flavour,
     )?;
 
-    flavour.raw_cmd(&migration).await?;
+    // flavour.raw_cmd(&migration).await?;
 
     Ok(())
 }

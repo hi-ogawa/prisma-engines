@@ -6,6 +6,7 @@ use schema_connector::{
 };
 use uuid::Uuid;
 
+#[cfg(not(feature = "slim"))]
 impl MigrationPersistence for SqlSchemaConnector {
     fn baseline_initialize(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         self.flavour.create_migrations_table()

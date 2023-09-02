@@ -1,3 +1,5 @@
+#![cfg(not(feature = "slim"))]
+
 //! All the quaint-wrangling for the mssql connector should happen here.
 
 use quaint::{

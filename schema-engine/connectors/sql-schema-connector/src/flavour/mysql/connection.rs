@@ -1,3 +1,5 @@
+#![cfg(not(feature = "slim"))]
+
 //! All the quaint-wrangling for the mysql connector should happen here.
 
 use enumflags2::BitFlags;

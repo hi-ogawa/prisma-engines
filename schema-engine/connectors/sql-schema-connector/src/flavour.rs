@@ -108,8 +108,10 @@ pub(crate) trait SqlFlavour:
     + Sync
     + Debug
 {
+    #[cfg(not(feature = "slim"))]
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
+    #[cfg(not(feature = "slim"))]
     fn apply_migration_script<'a>(
         &'a mut self,
         migration_name: &'a str,
@@ -129,30 +131,37 @@ pub(crate) trait SqlFlavour:
     }
 
     /// The connection string received in set_params().
+    #[cfg(not(feature = "slim"))]
     fn connection_string(&self) -> Option<&str>;
 
     /// See MigrationConnector::connector_type()
     fn connector_type(&self) -> &'static str;
 
     /// Create a database for the given URL on the server, if applicable.
+    #[cfg(not(feature = "slim"))]
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>>;
 
     /// Initialize the `_prisma_migrations` table.
+    #[cfg(not(feature = "slim"))]
     fn create_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// The datamodel connector corresponding to the flavour
     fn datamodel_connector(&self) -> &'static dyn psl::datamodel_connector::Connector;
 
+    #[cfg(not(feature = "slim"))]
     fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>>;
 
     /// Drop the database.
+    #[cfg(not(feature = "slim"))]
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// Drop the migrations table
+    #[cfg(not(feature = "slim"))]
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// List all visible tables in the given namespaces,
     /// including the search path.
+    #[cfg(not(feature = "slim"))]
     fn table_names(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>>;
 
     /// Return an empty database schema. This happens in the flavour, because we need
@@ -164,9 +173,11 @@ pub(crate) trait SqlFlavour:
     /// Check a connection to make sure it is usable by the schema engine.
     /// This can include some set up on the database, like ensuring that the
     /// schema we connect to exists.
+    #[cfg(not(feature = "slim"))]
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// Same as [describe_schema], but only called for introspection.
+    #[cfg(not(feature = "slim"))]
     fn introspect<'a>(
         &'a mut self,
         namespaces: Option<Namespaces>,
@@ -175,6 +186,7 @@ pub(crate) trait SqlFlavour:
         self.describe_schema(namespaces)
     }
 
+    #[cfg(not(feature = "slim"))]
     fn load_migrations_table(
         &mut self,
     ) -> BoxFuture<'_, ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>>> {
@@ -244,28 +256,34 @@ pub(crate) trait SqlFlavour:
         })
     }
 
+    #[cfg(not(feature = "slim"))]
     fn query<'a>(
         &'a mut self,
         query: quaint::ast::Query<'a>,
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>>;
 
+    #[cfg(not(feature = "slim"))]
     fn query_raw<'a>(
         &'a mut self,
         sql: &'a str,
         params: &'a [quaint::prelude::Value<'a>],
     ) -> BoxFuture<'_, ConnectorResult<quaint::prelude::ResultSet>>;
 
+    #[cfg(not(feature = "slim"))]
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>>;
 
     /// Drop the database and recreate it empty.
+    #[cfg(not(feature = "slim"))]
     fn reset(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// Optionally scan a migration script that could have been altered by users and emit warnings.
+    #[cfg(not(feature = "slim"))]
     fn scan_migration_script(&self, _script: &str) {}
 
     /// Apply the given migration history to a shadow database, and return
     /// the final introspected SQL schema. The third parameter is an optional shadow database url
     /// in case there is one at this point of the command, but not earlier in set_params().
+    #[cfg(not(feature = "slim"))]
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
@@ -274,6 +292,7 @@ pub(crate) trait SqlFlavour:
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>>;
 
     /// Receive and validate connector params.
+    #[cfg(not(feature = "slim"))]
     fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()>;
 
     /// Sets the preview features. This is currently useful for MultiSchema, as we want to
@@ -288,8 +307,10 @@ pub(crate) trait SqlFlavour:
         crate::MIGRATIONS_TABLE_NAME.into()
     }
 
+    #[cfg(not(feature = "slim"))]
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>>;
 
+    #[cfg(not(feature = "slim"))]
     fn search_path(&self) -> &str;
 }
 
@@ -314,6 +335,7 @@ fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<P
     }
 }
 
+#[cfg(not(feature = "slim"))]
 fn quaint_error_to_connector_error(error: quaint::error::Error, connection_info: &ConnectionInfo) -> ConnectorError {
     match user_facing_errors::quaint::render_quaint_error(error.kind(), connection_info) {
         Some(user_facing_error) => user_facing_error.into(),
