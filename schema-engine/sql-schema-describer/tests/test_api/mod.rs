@@ -94,9 +94,15 @@ impl TestApi {
                 .await
             }
             SqlFamily::Sqlite => {
-                sql_schema_describer::sqlite::SqlSchemaDescriber::new(&self.database)
+                #[cfg(not(feature = "slim"))]
+                {
+                    sql_schema_describer::sqlite::SqlSchemaDescriber::new(&self.database)
                     .describe_impl()
                     .await
+                }
+
+                #[cfg(feature = "slim")]
+                todo!()
             }
             SqlFamily::Mysql => {
                 use mysql::Circumstances;
