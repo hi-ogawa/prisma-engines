@@ -3485,6 +3485,7 @@ dependencies = [
  "postgres-native-tls",
  "postgres-types",
  "rusqlite",
+ "serde",
  "serde_json",
  "sqlformat",
  "thiserror",

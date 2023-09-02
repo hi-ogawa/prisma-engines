@@ -18,7 +18,8 @@ serde.workspace = true
 tracing = "0.1"
 tracing-error = "0.2"
 tracing-futures = "0.2"
-quaint.workspace = true
+# quaint.workspace = true
+quaint = { path = "../../quaint", default-features = false, features = ["slim"] }
 either = "1.8.0"
 
 [dev-dependencies]
@@ -27,3 +28,9 @@ pretty_assertions = "1"
 test-macros = { path = "../../libs/test-macros" }
 test-setup = { path = "../../libs/test-setup" }
 tokio.workspace = true
+
+[features]
+default = []
+slim = []
+
+# cargo build -p sql-schema-describer --features slim --target wasm32-unknown-unknown

@@ -6,6 +6,8 @@
 pub mod mssql;
 pub mod mysql;
 pub mod postgres;
+// sqlite requires connection?
+#[cfg(not(feature = "slim"))]
 pub mod sqlite;
 pub mod walkers;
 
