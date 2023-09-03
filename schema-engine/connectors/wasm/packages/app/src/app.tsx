@@ -15,20 +15,14 @@ export function App() {
 }
 
 function AppInner() {
-  const [schemaFrom, setSchemaFrom] = React.useState(DEMO_SCHEMAS[0]);
-  const [schemaTo, setSchemaTo] = React.useState(DEMO_SCHEMAS[1]);
+  const [schemaFrom, setSchemaFrom] = React.useState(DEMO_SCHEMAS[0]!);
+  const [schemaTo, setSchemaTo] = React.useState(DEMO_SCHEMAS[1]!);
   const [flavour, setFlavour] = React.useState("postgres");
-  const [result, setResult] = React.useState<string>();
 
   const initQuery = useInitWorkerQuery();
 
   const diffMutation = useMutation({
-    mutationFn: async () => {
-      return workerProxy.schema_diff(flavour, schemaFrom, schemaTo);
-    },
-    onSuccess(data, _variables, _context) {
-      setResult(data);
-    },
+    mutationFn: () => workerProxy.schema_diff(flavour, schemaFrom, schemaTo),
   });
 
   return (
@@ -68,7 +62,7 @@ function AppInner() {
         </label>
         <button
           className="antd-btn antd-btn-primary p-1"
-          disabled={!initQuery.isSuccess || diffMutation.isLoading}
+          disabled={!initQuery.isSuccess || diffMutation.isPending}
           onClick={() => {
             diffMutation.mutate();
           }}
@@ -76,13 +70,14 @@ function AppInner() {
           Generate SQL
         </button>
         <label className="flex flex-col gap-1 pt-2">
-          Output
+          Output {diffMutation.isError && "(Error)"}
           <textarea
             className="antd-input font-mono text-xs p-1"
+            aria-invalid={diffMutation.isError}
             rows={15}
             readOnly
-            disabled={!result}
-            value={result ?? ""}
+            disabled
+            value={diffMutation.data ?? diffMutation.error?.message ?? ""}
           />
         </label>
       </div>
@@ -151,6 +146,6 @@ function useInitWorkerQuery() {
       return null;
     },
     staleTime: Infinity,
-    cacheTime: Infinity,
+    gcTime: Infinity,
   });
 }

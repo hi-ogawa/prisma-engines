@@ -5,10 +5,11 @@ import {
   TinyRpcProxy,
 } from "@hiogawa/tiny-rpc";
 import { WorkerApi } from "./worker";
+import { once } from "@hiogawa/utils";
 
 export let workerProxy: TinyRpcProxy<WorkerApi>;
 
-export async function initializeWorkerProxy() {
+export const initializeWorkerProxy = once(async () => {
   const worker = new WorkerImport();
   workerProxy = proxyTinyRpc<WorkerApi>({
     adapter: messagePortClientAdapter({
@@ -16,4 +17,4 @@ export async function initializeWorkerProxy() {
     }),
   });
   await workerProxy.init();
-}
+});

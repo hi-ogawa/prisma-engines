@@ -17,9 +17,6 @@ function main() {
     routes: workerApi,
     adapter: messagePortServerAdapter({
       port: globalThis,
-      onError(e) {
-        console.error("[TinyRpcWorker]", e);
-      },
     }),
   });
 }
