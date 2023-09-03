@@ -1,24 +1,24 @@
 {
   "name": "@hiogawa/prisma-schema-diff-wasm",
-  "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./pkg/index.js",
+  "types": "./pkg/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.js"
+      "import": "./pkg/index.js",
+      "types": "./pkg/index.d.js"
+    },
+    "./node": {
+      "import": "./pkg/node.js",
+      "types": "./pkg/node.d.ts"
     },
     "./pkg": {
       "import": "./pkg/index.js",
-      "require": "./pkg/index.js",
       "types": "./pkg/index.d.ts"
     },
     "./pkg/index_bg.wasm": {
-      "import": "./pkg/index_bg.wasm",
-      "require": "./pkg/index_bg.wasm"
+      "import": "./pkg/index_bg.wasm"
     }
   },
   "files": [
@@ -28,13 +28,19 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf pkg dist",
-    "build": "pnpm run /^build:/",
+    "build": "pnpm run --seq /^build:/",
     "build:wasm": "wasm-pack build --target web --out-name index ${BUILD_TYPE:---release}",
     "build:fix-pkg": "rm -f pkg/package.json pkg/.gitignore pkg/README.md",
+    "build:tsup": "tsup",
     "test": "vitest",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
+    "@tsconfig/strictest": "^2.0.2",
+    "@types/node": "^20.5.9",
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2",
+    "vitest": "^0.34.3",
     "wasm-pack": "^0.12.1"
   }
 }
