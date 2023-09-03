@@ -1,6 +1,6 @@
 {
   "name": "@hiogawa/prisma-schema-diff-wasm",
-  "version": "0.0.1-pre.0",
+  "version": "0.0.1-pre.1",
   "type": "module",
   "main": "./pkg/index.js",
   "module": "./pkg/index.js",
@@ -27,6 +27,7 @@
     "pkg/*",
     "dist/*"
   ],
+  "homepage": "https://github.com/hi-ogawa/prisma-engines/pull/2",
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf pkg dist",
