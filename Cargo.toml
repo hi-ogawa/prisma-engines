@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+  "schema-engine/core/packages/diff-napi",
   "schema-engine/cli",
   "schema-engine/core",
   "schema-engine/connectors/*",

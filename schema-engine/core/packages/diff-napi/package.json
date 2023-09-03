@@ -1,0 +1,13 @@
+{
+  "name": "@hiogawa/prisma-diff-napi",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "vitest",
+    "build": "napi build --platform"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.16.3",
+    "vitest": "^0.34.3"
+  }
+}
