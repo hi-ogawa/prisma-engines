@@ -15,8 +15,8 @@ export function App() {
 }
 
 function AppInner() {
-  const [schemaFrom, setSchemaFrom] = React.useState("");
-  const [schemaTo, setSchemaTo] = React.useState(DEMO_SCHEMA);
+  const [schemaFrom, setSchemaFrom] = React.useState(DEMO_SCHEMAS[0]);
+  const [schemaTo, setSchemaTo] = React.useState(DEMO_SCHEMAS[1]);
   const [flavour, setFlavour] = React.useState("postgres");
   const [result, setResult] = React.useState<string>();
 
@@ -37,8 +37,8 @@ function AppInner() {
         <label className="flex flex-col gap-1">
           From
           <textarea
-            className="antd-input font-mono text-sm p-1"
-            rows={6}
+            className="antd-input font-mono text-xs p-1"
+            rows={12}
             value={schemaFrom}
             onChange={(e) => setSchemaFrom(e.target.value)}
           />
@@ -46,8 +46,8 @@ function AppInner() {
         <label className="flex flex-col gap-1">
           To
           <textarea
-            className="antd-input font-mono text-sm p-1"
-            rows={6}
+            className="antd-input font-mono text-xs p-1"
+            rows={12}
             value={schemaTo}
             onChange={(e) => setSchemaTo(e.target.value)}
           />
@@ -78,8 +78,8 @@ function AppInner() {
         <label className="flex flex-col gap-1 pt-2">
           Output
           <textarea
-            className="antd-input font-mono text-sm p-1"
-            rows={10}
+            className="antd-input font-mono text-xs p-1"
+            rows={15}
             readOnly
             disabled={!result}
             value={result ?? ""}
@@ -90,11 +90,26 @@ function AppInner() {
   );
 }
 
-const DEMO_SCHEMA = `\
-model users {
-  id    Int @id @default(autoincrement())
+const DEMO_SCHEMAS = [
+  `\
+model User {
+  id        Int @id @default(autoincrement())
 }
-`;
+`,
+  `\
+model User {
+  id        Int @id @default(autoincrement())
+  profile   Profile?
+}
+
+model Profile {
+  id        Int @id @default(autoincrement())
+  bio       String
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int @unique
+}
+`,
+];
 
 function Header() {
   const initQuery = useInitWorkerQuery();
