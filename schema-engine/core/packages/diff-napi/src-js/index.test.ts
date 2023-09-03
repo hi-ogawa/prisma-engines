@@ -24,6 +24,21 @@ describe(diffSchema, () => {
       ALTER TABLE \`counter\` ADD COLUMN \`value\` INTEGER NOT NULL;
       "
     `);
+    // no alter table supported for sqlite or does it require some special setup with real connection?
+    expect(diffSchema("sqlite", schemaFrom, schemaTo)).toMatchInlineSnapshot(`
+      "-- RedefineTables
+      PRAGMA foreign_keys=OFF;
+      CREATE TABLE \\"new_counter\\" (
+          \\"id\\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+          \\"value\\" INTEGER NOT NULL
+      );
+      INSERT INTO \\"new_counter\\" (\\"id\\") SELECT \\"id\\" FROM \\"counter\\";
+      DROP TABLE \\"counter\\";
+      ALTER TABLE \\"new_counter\\" RENAME TO \\"counter\\";
+      PRAGMA foreign_key_check;
+      PRAGMA foreign_keys=ON;
+      "
+    `);
   });
 });
 
