@@ -5,12 +5,18 @@ settings:
   excludeLinksFromLockfile: false
 
 devDependencies:
+  '@hiogawa/tiny-cli':
+    specifier: 0.0.4-pre.1
+    version: 0.0.4-pre.1
   '@tsconfig/strictest':
     specifier: ^2.0.2
     version: 2.0.2
   '@types/node':
     specifier: ^20.5.9
     version: 20.5.9
+  prettier:
+    specifier: ^3.0.3
+    version: 3.0.3
   tsup:
     specifier: ^7.2.0
     version: 7.2.0(typescript@5.2.2)
@@ -223,6 +229,10 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@hiogawa/tiny-cli@0.0.4-pre.1:
+    resolution: {integrity: sha512-3z/qYXDyROVX8oaFdqMyiLL8ZZE9dEaEw02ZYXOxmUF6U5MM3pskzLZId/KMvT+ZnLCLI4CUBuga6AIf56JXTw==}
+    dev: true
 
   /@jest/schemas@29.6.3:
     resolution: {integrity: sha512-mo5j5X+jIZmJQveBKeS/clAueipV7KgiX1vMgCxam1RNYiqE1w62n0/tJJnHtjW8ZHcQco5gY85jA3mi0L+nSA==}
@@ -955,6 +965,12 @@ packages:
       nanoid: 3.3.6
       picocolors: 1.0.0
       source-map-js: 1.0.2
+    dev: true
+
+  /prettier@3.0.3:
+    resolution: {integrity: sha512-L/4pUDMxcNa8R/EthV08Zt42WBO4h1rarVtK0K+QJG0X187OLo7l699jWw0GKuwzkPQ//jMFA/8Xm6Fh3J/DAg==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /pretty-format@29.6.3:

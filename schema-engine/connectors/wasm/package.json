@@ -1,9 +1,11 @@
 {
   "name": "@hiogawa/prisma-schema-diff-wasm",
-  "version": "0.0.0",
+  "version": "0.0.1-pre.0",
   "type": "module",
   "main": "./pkg/index.js",
+  "module": "./pkg/index.js",
   "types": "./pkg/index.d.ts",
+  "bin": "bin/cli.js",
   "exports": {
     ".": {
       "import": "./pkg/index.js",
@@ -33,11 +35,17 @@
     "build:fix-pkg": "rm -f pkg/package.json pkg/.gitignore pkg/README.md",
     "build:tsup": "tsup",
     "test": "vitest",
+    "lint": "pnpm run --seq /^lint:/",
+    "lint-check": "pnpm run --seq /^lint-check:/",
+    "lint:prettier": "prettier --cache . --write",
+    "lint-check:prettier": "prettier --cache . --check",
     "release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
+    "@hiogawa/tiny-cli": "0.0.4-pre.1",
     "@tsconfig/strictest": "^2.0.2",
     "@types/node": "^20.5.9",
+    "prettier": "^3.0.3",
     "tsup": "^7.2.0",
     "typescript": "^5.2.2",
     "vitest": "^0.34.3",
