@@ -1,0 +1,30 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "vite --no-clearScreen",
+    "build": "pnpm run --seq /^build:/",
+    "build:vite": "vite build",
+    "build:vercel": "bash misc/vercel/build.sh",
+    "preview": "vite preview",
+    "release": "vercel deploy --prebuilt .",
+    "release-production": "vercel deploy --prebuilt . --prod"
+  },
+  "devDependencies": {
+    "@hiogawa/prisma-schema-diff-wasm": "workspace:*",
+    "@hiogawa/theme-script": "0.0.4-pre.3",
+    "@hiogawa/tiny-rpc": "0.2.3-pre.10",
+    "@hiogawa/unocss-preset-antd": "2.2.1-pre.3",
+    "@hiogawa/utils": "1.6.1-pre.5",
+    "@iconify-json/ri": "^1.1.12",
+    "@tanstack/react-query": "^4.33.0",
+    "@tanstack/react-query-devtools": "^4.33.0",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
+    "unocss": "^0.55.6",
+    "vite": "^4.4.9"
+  }
+}
