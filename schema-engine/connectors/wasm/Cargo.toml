@@ -1,0 +1,12 @@
+[package]
+name = "prisma-schema-diff-wasm"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = { version = "=0.2.84" }
+schema-connector = { path = "../schema-connector" }
+sql-schema-connector = { path = "../sql-schema-connector" }
