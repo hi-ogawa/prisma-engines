@@ -156,8 +156,7 @@ impl SqlSchemaConnector {
     }
 
     /// no-doc
-    pub fn db_schema_from_schema_string(&self, schema_string: &str) -> ConnectorResult<DatabaseSchema> {
-        let schema = psl::parse_schema(schema_string).map_err(ConnectorError::new_schema_parser_error)?;
+    pub fn db_schema_from_schema(&self, schema: &psl::ValidatedSchema) -> ConnectorResult<DatabaseSchema> {
         self.flavour.check_schema_features(&schema)?;
         Ok(From::from(sql_schema_calculator::calculate_sql_schema(
             &schema,

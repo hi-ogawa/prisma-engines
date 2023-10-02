@@ -10,5 +10,5 @@ pnpm dev
 
 # release
 pnpm build
-pnpm release
+pnpm release-production
 ```

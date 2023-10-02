@@ -17,12 +17,11 @@ export function App() {
 function AppInner() {
   const [schemaFrom, setSchemaFrom] = React.useState(DEMO_SCHEMAS[0]!);
   const [schemaTo, setSchemaTo] = React.useState(DEMO_SCHEMAS[1]!);
-  const [flavour, setFlavour] = React.useState("postgres");
 
   const initQuery = useInitWorkerQuery();
 
   const diffMutation = useMutation({
-    mutationFn: () => workerProxy.schema_diff(flavour, schemaFrom, schemaTo),
+    mutationFn: () => workerProxy.schema_diff(schemaFrom, schemaTo),
   });
 
   return (
@@ -32,7 +31,7 @@ function AppInner() {
           From
           <textarea
             className="antd-input font-mono text-xs p-1"
-            rows={12}
+            rows={8}
             value={schemaFrom}
             onChange={(e) => setSchemaFrom(e.target.value)}
           />
@@ -41,24 +40,10 @@ function AppInner() {
           To
           <textarea
             className="antd-input font-mono text-xs p-1"
-            rows={12}
+            rows={15}
             value={schemaTo}
             onChange={(e) => setSchemaTo(e.target.value)}
           />
-        </label>
-        <label className="flex flex-col gap-1">
-          Flavour
-          <select
-            className="antd-input p-1"
-            value={flavour}
-            onChange={(e) => setFlavour(e.target.value)}
-          >
-            {["postgres", "mysql", "sqlite", "cockroach", "mssql"].map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
         </label>
         <button
           className="antd-btn antd-btn-primary p-1"
@@ -87,19 +72,26 @@ function AppInner() {
 
 const DEMO_SCHEMAS = [
   `\
+datasource db {
+  provider = "mysql"
+  url      = "__dummy_url"
+}
 model User {
-  id        Int @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 }
 `,
   `\
+datasource db {
+  provider = "mysql"
+  url      = "__dummy_url"
+}
 model User {
   id        Int @id @default(autoincrement())
   profile   Profile?
 }
-
 model Profile {
   id        Int @id @default(autoincrement())
-  bio       String
+  bio       String @db.VarChar(255)
   user      User      @relation(fields: [userId], references: [id])
   userId    Int @unique
 }

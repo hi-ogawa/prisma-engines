@@ -13,9 +13,6 @@ const cli = new TinyCliCommand(
       from: arg.string("'From' prisma.schema file (default: empty schema)", {
         optional: true,
       }),
-      flavour: arg.string("database flavour (default: postgres)", {
-        default: "postgres",
-      }),
     },
   },
   async ({ args }) => {
@@ -25,7 +22,7 @@ const cli = new TinyCliCommand(
     );
     const from = args.from ? fs.readFileSync(args.from, "utf-8") : "";
     await pkg.default(await loadWasm());
-    const output = pkg.schema_diff(args.flavour, from, to);
+    const output = pkg.schema_diff(from, to);
     console.log(output);
   },
 );

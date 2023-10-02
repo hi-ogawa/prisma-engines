@@ -1,3 +1,8 @@
+datasource db {
+  provider = "mysql"
+  url      = "__dummy_url"
+}
+
 model users {
   id Int @id @default(autoincrement())
 }

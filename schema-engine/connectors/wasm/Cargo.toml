@@ -8,5 +8,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 wasm-bindgen = { version = "=0.2.84" }
+psl.workspace = true
 schema-connector = { path = "../schema-connector" }
 sql-schema-connector = { path = "../sql-schema-connector" }

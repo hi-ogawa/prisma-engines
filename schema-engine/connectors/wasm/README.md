@@ -16,18 +16,27 @@ Options:
   --from=...       'From' prisma.schema file (default: empty schema)
   --flavour=...    database flavour (default: postgres)
 
-$ echo -e 'model users { \n id Int @id \n }' | prisma-schema-diff-wasm -
+$ prisma-schema-diff-wasm - <<EOF
+datasource db {
+  provider = "mysql"
+  url      = "__dummy_url"
+}
+model users {
+  id    Int @id @default(autoincrement())
+}
+EOF
 -- CreateTable
-CREATE TABLE "users" (
-    "id" INTEGER NOT NULL,
+CREATE TABLE `users` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
 
-    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
-);
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 ## development
 
 ```sh
+pnpm i
 pnpm build
 pnpm test
 node bin/cli.js misc/example.prisma
