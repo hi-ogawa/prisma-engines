@@ -34,6 +34,10 @@ importers:
         version: 0.12.1
 
   packages/app:
+    dependencies:
+      '@hiogawa/tiny-toast':
+        specifier: 0.1.1-pre.7
+        version: 0.1.1-pre.7(react@18.2.0)
     devDependencies:
       '@hiogawa/prisma-schema-diff-wasm':
         specifier: workspace:*
@@ -74,9 +78,6 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
-      react-hot-toast:
-        specifier: ^2.4.1
-        version: 2.4.1(csstype@3.1.2)(react-dom@18.2.0)(react@18.2.0)
       unocss:
         specifier: ^0.55.6
         version: 0.55.6(postcss@8.4.29)(vite@4.4.9)
@@ -537,6 +538,17 @@ packages:
   /@hiogawa/tiny-rpc@0.2.3-pre.10:
     resolution: {integrity: sha512-yudfX7yaQQAtq+pU1ln3oxNA8LGyXFNGqdRNxVTxFBdjPAb3SNLO1E/NUWy/rEERdImqzja3z9SrJYDyOeatxQ==}
     dev: true
+
+  /@hiogawa/tiny-toast@0.1.1-pre.7(react@18.2.0):
+    resolution: {integrity: sha512-Qjp/sFedLhvhb2B69X/CyaU4d+fd+OWlPCh08WvWL3NUcH1zGbfz7wceLoTNVM7ye8TqtgK5UmjFJ7adeEz14g==}
+    peerDependencies:
+      react: ^18.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /@hiogawa/unocss-preset-antd@2.2.1-pre.3(@unocss/preset-uno@0.55.6)(unocss@0.55.6):
     resolution: {integrity: sha512-NjJ0uKIA6tqmDTXQkO52Hb83tBJjwjOCUx9cgodxiROjTCuEP+yfkmJyzMlDzfxRUl8DnHd8IijnZl2cAX7s9Q==}
@@ -1437,14 +1449,6 @@ packages:
       slash: 3.0.0
     dev: true
 
-  /goober@2.1.13(csstype@3.1.2):
-    resolution: {integrity: sha512-jFj3BQeleOoy7t93E9rZ2de+ScC4lQICLwiAQmKMg9F6roKGaLSHoCDYKkWlSafg138jejvq/mTdvmnwDQgqoQ==}
-    peerDependencies:
-      csstype: ^3.0.10
-    dependencies:
-      csstype: 3.1.2
-    dev: true
-
   /gzip-size@6.0.0:
     resolution: {integrity: sha512-ax7ZYomf6jqPTQ4+XCpUGyXKHk5WweS+e05MBO4/y3WJ5RkmPXNKvX+bx1behVILVwr6JSQvZAku021CHPXG3Q==}
     engines: {node: '>=10'}
@@ -1523,7 +1527,6 @@ packages:
 
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
-    dev: true
 
   /jsesc@2.5.2:
     resolution: {integrity: sha512-OYu7XEzjkCQ3C5Ps3QIZsQfNpqoJyZZA99wd9aWd05NCtC5pWOkShK2mkL6HXQR6/Cy2lbNdPlZBpuQHXE63gA==}
@@ -1580,7 +1583,6 @@ packages:
     hasBin: true
     dependencies:
       js-tokens: 4.0.0
-    dev: true
 
   /loupe@2.3.6:
     resolution: {integrity: sha512-RaPMZKiMy8/JruncMU5Bt6na1eftNoo++R4Y+N2FrxkDVTrGvcyzFTsaGif4QTeKESheMGegbhw6iUAq+5A8zA==}
@@ -1871,20 +1873,6 @@ packages:
       scheduler: 0.23.0
     dev: true
 
-  /react-hot-toast@2.4.1(csstype@3.1.2)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-j8z+cQbWIM5LY37pR6uZR6D4LfseplqnuAO4co4u8917hBUvXlEqyP1ZzqVLcqoyUesZZv/ImreoCeHVDpE5pQ==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      react: '>=16'
-      react-dom: '>=16'
-    dependencies:
-      goober: 2.1.13(csstype@3.1.2)
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-    transitivePeerDependencies:
-      - csstype
-    dev: true
-
   /react-is@18.2.0:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
     dev: true
@@ -1899,7 +1887,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       loose-envify: 1.4.0
-    dev: true
 
   /readdirp@3.6.0:
     resolution: {integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==}
