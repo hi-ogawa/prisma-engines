@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import React from "react";
 import { initializeWorkerProxy, workerProxy } from "./worker-proxy";
 import { setTheme, getTheme } from "@hiogawa/theme-script";
+import { toast } from "./toast";
 
 export function App() {
   return (
@@ -14,9 +15,15 @@ export function App() {
   );
 }
 
+const initUrlParams = new URLSearchParams(window.location.search);
+
 function AppInner() {
-  const [schemaFrom, setSchemaFrom] = React.useState(DEMO_SCHEMAS[0]!);
-  const [schemaTo, setSchemaTo] = React.useState(DEMO_SCHEMAS[1]!);
+  const [schemaFrom, setSchemaFrom] = React.useState(
+    () => initUrlParams.get("schemaFrom") ?? DEMO_SCHEMAS[0]!,
+  );
+  const [schemaTo, setSchemaTo] = React.useState(
+    () => initUrlParams.get("schemaTo") ?? DEMO_SCHEMAS[1]!,
+  );
 
   const initQuery = useInitWorkerQuery();
 
@@ -65,6 +72,18 @@ function AppInner() {
             value={diffMutation.data ?? diffMutation.error?.message ?? ""}
           />
         </label>
+        <button
+          className="antd-btn antd-btn-default p-1"
+          onClick={async () => {
+            const params = new URLSearchParams({ schemaFrom, schemaTo });
+            const shareUrl = window.location.origin + "?" + params;
+            window.history.replaceState({}, "", shareUrl);
+            window.navigator.clipboard.writeText(shareUrl);
+            toast.success("Share URL is copied to clipboard!");
+          }}
+        >
+          Share link
+        </button>
       </div>
     </div>
   );
@@ -103,7 +122,7 @@ function Header() {
 
   return (
     <header className="top-0 sticky antd-body flex items-center p-2 px-4 gap-3 shadow-md shadow-black/[0.05] dark:shadow-black/[0.7] z-1">
-      <div>prisma-schema-diff-wasm</div>
+      <a href="/">prisma-schema-diff-wasm</a>
       <div className="flex-1"></div>
       {initQuery.isLoading && (
         <span className="antd-spin w-4 h-4" title="Loading wasm..."></span>
@@ -117,6 +136,7 @@ function Header() {
     </header>
   );
 }
+
 function ThemeSelect() {
   return (
     <button
